@@ -1,22 +1,30 @@
 import easyocr
-# from paddleocr import PaddleOCR, draw_ocr
-# ocr = PaddleOCR(use_angle_cls=True, lang="ch")  # need to run only once to download and load model into memory
-# img_path = './imgs/11.jpg'
-# result = ocr.ocr(img_path, cls=True)
-# for idx in range(len(result)):
-#     res = result[idx]
-#     for line in res:
-#         print(line)
+import keras_ocr
 
-# reader = easyocr.Reader(['en'], gpu = True)
-
-class Easyocr:
+class EasyOCR:
   def __init__(self, path) -> None:
-      self.path = path
+    self.path = path
 
   def extract(self):
+    result = []
     reader = easyocr.Reader(['en'], gpu = True)
-    return reader.readtext(self.path, min_size = 1)
+    extracted_info = reader.readtext(self.path, min_size = 1)
+    for tuple in extracted_info:
+      data = {'coordinate': tuple[0], 'text': tuple[1], 'confidence':tuple[2]}
+      result.append(data)
+    return result
 
-easy = Easyocr('test_images/missouri.webp')
-print(easy.extract())
+class KerasOCR:
+  def __init__(self, path) -> None:
+    self.path = path
+
+  def extract(self):
+    result = []
+    pipeline = keras_ocr.pipeline.Pipeline()
+    extracted_info = pipeline.recognize([self.path])
+    for tuple in extracted_info[0]:
+      data = {'coordinate': tuple[1], 'text': tuple[0], 'confidence': None}
+      result.append(data)
+    return result
+
+
