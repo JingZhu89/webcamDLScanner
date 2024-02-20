@@ -1,57 +1,22 @@
-from ctypes.wintypes import tagRECT
-from pickletools import TAKEN_FROM_ARGUMENT1
 import easyocr
-reader = easyocr.Reader(['en'], gpu = True)
-extracted_info = reader.readtext("test_images/missouri.webp")
+# from paddleocr import PaddleOCR, draw_ocr
+# ocr = PaddleOCR(use_angle_cls=True, lang="ch")  # need to run only once to download and load model into memory
+# img_path = './imgs/11.jpg'
+# result = ocr.ocr(img_path, cls=True)
+# for idx in range(len(result)):
+#     res = result[idx]
+#     for line in res:
+#         print(line)
 
+# reader = easyocr.Reader(['en'], gpu = True)
 
-def findTuple(text, extracted_info):
-  for tuple in extracted_info:
-    if tuple[1].startswith(text):
-      return tuple
+class Easyocr:
+  def __init__(self, path) -> None:
+      self.path = path
 
-def getCoordinatesFromTuple(tuple):
-  bottomLeft, bottomRight, topRight, topLeft = tuple[0]
-  rX = (bottomRight[0] + topRight[0])/2
-  lX = (bottomLeft[0] + topLeft[0])/2
-  tY = (topLeft[1] + topRight[1])/2
-  bY = (bottomLeft[1] + bottomRight[1])/2
-  return [lX, rX, tY, bY]
+  def extract(self):
+    reader = easyocr.Reader(['en'], gpu = True)
+    return reader.readtext(self.path, min_size = 1)
 
-def sameLineClosestLeft(identifier_tuple, extracted_info):
-  lX, rX, tY, bY = getCoordinatesFromTuple(identifier_tuple)
-  # identifier_tuple's Y coordinate should overlap with target
-  # identifier_tuple's rX coordinate should be the closest to the rx of the target
-  target_tuple = None
-  minXDistance = 999999
-  for tuple in extracted_info:
-    t_lX, t_rX, t_tY, t_bY = getCoordinatesFromTuple(tuple)
-    if t_lX == lX and t_rX == rX and t_tY == tY and t_bY == bY:
-      continue
-    else:
-      xDistance = t_lX - lX
-      if xDistance >= 0 and xDistance <= minXDistance and yOverlap(tY, bY, t_tY, t_bY):
-        minXDistance = xDistance
-        target_tuple = tuple
-  return target_tuple
-
-def yOverlap(tY, bY, t_tY, t_bY):
-  if (tY <= t_tY and tY >= t_bY) or \
-     (bY <= t_tY and bY >= t_bY) or \
-     (t_bY <= tY and t_bY >= bY) or \
-     (t_tY <= tY and t_tY >= bY) :
-    return True
-  else:
-    return False
-
-def nextLineClosest():
-  pass
-
-for el in extracted_info:
-  print(el)
-
-expiration = findTuple('4b', extracted_info)
-print("expiration", sameLineClosestLeft(expiration, extracted_info))
-issue = findTuple('4a', extracted_info)
-print(issue)
-print("issue", sameLineClosestLeft(issue, extracted_info))
+easy = Easyocr('test_images/missouri.webp')
+print(easy.extract())
