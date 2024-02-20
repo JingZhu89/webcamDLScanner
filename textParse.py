@@ -1,7 +1,7 @@
 from extract import EasyOCR, KerasOCR
 import re
 
-MAX = 15
+MAX = 10
 MIN = -8
 PREFIX = {
           '4a': 'Issue_Date',
@@ -13,9 +13,9 @@ PREFIX = {
           '8': 'Address'
          }
 
-# easy = EasyOCR('test_images/missouri.webp')
+# easy = EasyOCR('threshold.jpg')
 # extracted_info = easy.extract()
-keras = KerasOCR('test_images/missouri.webp')
+keras = KerasOCR('threshold.jpg')
 extracted_info = keras.extract()
 
 def findTuplesWithPrefix(prefix, extracted_info):
@@ -129,8 +129,8 @@ def getAddress():
   pass
 
 
-# for el in extracted_info:
-#   print(el)
+for el in extracted_info:
+  print(el)
 
 print(stringsStartWithPrefix('4a', extracted_info))
 print(stringsStartWithPrefix('4b', extracted_info))
