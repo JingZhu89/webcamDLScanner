@@ -4,13 +4,13 @@ import re
 MAX = 10
 MIN = -8
 PREFIX = {
-          '4a': 'Issue_Date',
-          '4d': 'DL_Number',
-          '4b': 'Expiration',
-          '1' : 'First_Name',
-          '2' : 'Last_Name',
-          '3': 'DOB',
-          '8': 'Address'
+          'Issue_Date' : '4a',
+          'DL_Number': '4d',
+          'Expiration': '4b',
+          'First_Name': '1',
+          'Last_Name': '2' ,
+          'DOB': '3',
+          'Address': '8'
          }
 
 easy = EasyOCR('threshold.jpg')
@@ -21,7 +21,7 @@ extracted_info = easy.extract()
 def findTuplesWithPrefix(prefix, extracted_info):
   result = []
   for el in extracted_info:
-    if el['text'].startswith(prefix):
+    if el['text'].startswith(prefix) and noTextBoxOnTheLeft(el, extracted_info):
       result.append(el)
   return result
 
@@ -95,9 +95,8 @@ def yConnected(tY, bY, t_tY, t_bY) -> bool:
   else:
     return False
 
-def getDate(text) -> str:
-  match = re.search(r'\d{2}/\d{2}/\d{4}', text)
-  return text[match.span()[0]: match.span()[1]]
+def getDate(text):
+  return re.search(r'\d{2}/\d{2}/\d{4}', text)
 
 def connectText(dataSets) -> str:
   result = ''
@@ -112,28 +111,58 @@ def stringsStartWithPrefix(prefix, extracted_info) -> list:
     strings.append(connectedOnTheRight(dataSet, extracted_info))
   return strings
 
+def noTextBoxOnTheLeft(targetDataSet, extracted_info):
+  t_lX, t_rX, t_tY, t_bY = getCoordinatesFromData(targetDataSet)
+  for dataSet in extracted_info:
+    lX, rX, tY, bY = getCoordinatesFromData(dataSet)
+    if xConnected(lX, rX, t_lX, t_rX) and yOverlap(tY, bY, t_tY, t_bY):
+      return False
+  return True
 
-def getIssueDate():
+def getIssueDate(extracted_info):
+  potential_matches = stringsStartWithPrefix('4a', extracted_info)
+  for el in potential_matches:
+    match = getDate(el)
+    if match:
+      return match.group()
+
+def getExpirationDate(extracted_info):
+  potential_matches = stringsStartWithPrefix('4b', extracted_info)
+  for el in potential_matches:
+    match = getDate(el)
+    if match:
+      return match.group()
+
+def getFirstName(extracted_info):
+  potential_matches = stringsStartWithPrefix('1', extracted_info)
+  for el in potential_matches:
+    match = re.search(r'^\d{1}[A-Z ]', el)
+    if match:
+      return el[1:].strip()
+
+def getLastName(extracted_info):
+  potential_matches = stringsStartWithPrefix('2', extracted_info)
+  for el in potential_matches:
+    match = re.search(r'^\d{1}[A-Z ]', el)
+    if match:
+      return el[1:].strip()
+
+def getAddressFirstLine(extracted_info):
+  potential_matches = stringsStartWithPrefix('8', extracted_info)
+  return potential_matches[0][1:].strip()
+
+def getAddressSecondLine():
   pass
 
-def getExpirationDate():
-  pass
+# for el in extracted_info:
+#   print(el)
 
-def getFirstName():
-  pass
-
-def getLastName():
-  pass
-
-def getAddress():
-  pass
-
-
-for el in extracted_info:
-  print(el)
-
-print(stringsStartWithPrefix('4a', extracted_info))
-print(stringsStartWithPrefix('4b', extracted_info))
-print(stringsStartWithPrefix('1', extracted_info))
-print(stringsStartWithPrefix('2', extracted_info))
-print(stringsStartWithPrefix('8', extracted_info))
+print(getIssueDate(extracted_info))
+print(getExpirationDate(extracted_info))
+print(getFirstName(extracted_info))
+print(getLastName(extracted_info))
+print(getAddressFirstLine(extracted_info))
+# print(stringsStartWithPrefix('4b', extracted_info))
+# print(stringsStartWithPrefix('1', extracted_info))
+# print(stringsStartWithPrefix('2', extracted_info))
+# print(stringsStartWithPrefix('8', extracted_info))
