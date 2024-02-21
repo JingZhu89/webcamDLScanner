@@ -13,10 +13,10 @@ PREFIX = {
           '8': 'Address'
          }
 
-# easy = EasyOCR('threshold.jpg')
-# extracted_info = easy.extract()
-keras = KerasOCR('threshold.jpg')
-extracted_info = keras.extract()
+easy = EasyOCR('threshold.jpg')
+extracted_info = easy.extract()
+# keras = KerasOCR('threshold.jpg')
+# extracted_info = keras.extract()
 
 def findTuplesWithPrefix(prefix, extracted_info):
   result = []
