@@ -1,16 +1,20 @@
 import easyocr
 import keras_ocr
-import cv2
-import numpy as np
-import matplotlib.pyplot as plt
+from abc import ABC, abstractmethod
 
-
-class OCR:
-  pass
-
-class EasyOCR(OCR):
+class OCR(ABC):
   def __init__(self, path) -> None:
     self.path = path
+
+  @abstractmethod
+  def extract(self):
+    pass
+
+class EasyOCR(OCR):
+  MIN = -8
+  MAX = 10
+  def __init__(self, path) -> None:
+    super().__init__(path)
 
   def extract(self):
     result = []
@@ -22,8 +26,10 @@ class EasyOCR(OCR):
     return result
 
 class KerasOCR(OCR):
+  MIN = -8
+  MAX = 10
   def __init__(self, path) -> None:
-    self.path = path
+    super().__init__(path)
 
   def extract(self):
     result = []
@@ -34,9 +40,6 @@ class KerasOCR(OCR):
       result.append(data)
     return result
 
-image = cv2.imread("test_images/missouri.webp")
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-blurred = cv2.GaussianBlur(gray, (3, 3), 0)
 
 
 
