@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
-
 from myapp.extract import EasyOCR, KerasOCR
 from myapp.preProcessor import PreProcessor
 from myapp.parseText import ParseText
@@ -19,4 +18,5 @@ def home(request):
               'issue_date': extractedData.issueDate,
               'expiration_date': extractedData.expirationDate
             }
+    myPorcessor.cleanupFiles()
   return JsonResponse(data)
