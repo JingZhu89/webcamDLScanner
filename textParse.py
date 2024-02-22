@@ -21,6 +21,7 @@ class ParseText:
     self.firstName = self.getFirstName()
     self.lastName = self.getLastName()
     self.addressOne = self.getAddressFirstLine()
+    self.addressTwo = self.getAddressSecondLine()
 
   def findTuplesWithPrefix(self, prefix):
     result = []
@@ -153,19 +154,18 @@ class ParseText:
 
   def getAddressFirstLine(self):
     potential_matches = self.stringsStartWithPrefix('8')
+    # need to add code to take out potential bad matches
     return potential_matches[0][1:].strip()
 
   def getAddressSecondLine(self):
-
-    pass
-
-# for el in extracted_info:
-#   print(el)
-
-
-
-processedImages = PreProcessor('test_images/missouri.webp')
-easy = EasyOCR(processedImages.grayScaleImgPath)
-extracted_info = easy.extract()
-parse = ParseText(easy.MIN, easy.MAX, extracted_info)
-print(parse.addressOne, parse.expirationDate, parse.issueDate, parse.firstName, parse.lastName)
+    addressOne = None
+    for el in self.extractedInfo:
+      if self.addressOne in el['text']:
+        addressOne = el
+        break
+    t_lX, t_rX, t_tY, t_bY = self.getCoordinatesFromData(addressOne)
+    for el in self.extractedInfo:
+      lX, rX, tY, bY = self.getCoordinatesFromData(el)
+      if self.xOverlap(lX, rX, t_lX, t_rX) and self.yConnected(tY, bY, t_tY, t_bY):
+        addressTwo = self.connectedOnTheRight(el)
+        return addressTwo.strip()

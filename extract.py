@@ -11,7 +11,7 @@ class OCR(ABC):
     pass
 
 class EasyOCR(OCR):
-  MIN = -8
+  MIN = -10
   MAX = 10
   def __init__(self, path) -> None:
     super().__init__(path)
