@@ -1,6 +1,5 @@
-from extract import EasyOCR, KerasOCR
 import re
-from imagePreProcessor import PreProcessor
+
 PREFIX = {
           'Issue_Date' : '4a',
           'DL_Number': '4d',

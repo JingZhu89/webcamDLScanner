@@ -1,4 +1,3 @@
-from curses import newpad
 import cv2
 import numpy as np
 from deskew import determine_skew
@@ -59,3 +58,9 @@ class PreProcessor:
 
   def extractFileName(self):
     return os.path.basename(self.originalImgPath).split('/')[-1].split('.')[0]
+
+  def cleanupFiles(self):
+    my_dir = 'processed_images'
+    for fname in os.listdir(my_dir):
+      if fname.startwith(self.imgName):
+        os.remove(os.path.join(my_dir, fname))

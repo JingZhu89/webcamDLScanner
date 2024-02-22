@@ -1,2 +1,4 @@
 processed_images/
 test_images/
+db.sqlite3
+__pycache__
