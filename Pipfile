@@ -12,6 +12,7 @@ opencv-python = "*"
 numpy = "*"
 django = "*"
 tensorflow = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

@@ -6,8 +6,9 @@ from myapp.parseText import ParseText
 
 # Create your views here.
 def home(request):
-  print(request.read(), request.path, request.method)
   if request.method == 'GET':
+    img = request.body
+    print(type(img))
     myPorcessor = PreProcessor('myapp/test_images/missouri.webp')
     easy = EasyOCR(myPorcessor.grayScaleImgPath)
     extractedData = ParseText(easy.MIN, easy.MAX, easy.extract())
@@ -19,4 +20,5 @@ def home(request):
               'expiration_date': extractedData.expirationDate
             }
     myPorcessor.cleanupFiles()
+
   return JsonResponse(data)
