@@ -15,21 +15,21 @@ class ParseText:
     self.MIN = min
     self.MAX = max
     self.extractedInfo = extractedInfo
-    self.issueDate = self.getIssueDate()
-    self.expirationDate = self.getExpirationDate()
-    self.firstName = self.getFirstName()
-    self.lastName = self.getLastName()
-    self.addressOne = self.getAddressFirstLine()
-    self.addressTwo = self.getAddressSecondLine()
+    self.issueDate = self._getIssueDate()
+    self.expirationDate = self._getExpirationDate()
+    self.firstName = self._getFirstName()
+    self.lastName = self._getLastName()
+    self.addressOne = self._getAddressFirstLine()
+    self.addressTwo = self._getAddressSecondLine()
 
-  def findTuplesWithPrefix(self, prefix):
+  def _findTuplesWithPrefix(self, prefix):
     result = []
     for el in self.extractedInfo:
-      if el['text'].startswith(prefix) and self.noTextBoxOnTheLeft(el):
+      if el['text'].startswith(prefix) and self._noTextBoxOnTheLeft(el):
         result.append(el)
     return result
 
-  def getCoordinatesFromData(self, dataSet):
+  def _getCoordinatesFromData(self, dataSet):
     bottomLeft, bottomRight, topRight, topLeft = dataSet['coordinate']
     rX = (bottomRight[0] + topRight[0])/2
     lX = (bottomLeft[0] + topLeft[0])/2
@@ -37,39 +37,39 @@ class ParseText:
     bY = (bottomLeft[1] + bottomRight[1])/2
     return [lX, rX, tY, bY]
 
-  def connectedOnTheRight(self, identifier_set):
+  def _connectedOnTheRight(self, identifier_set):
     # identifier_tuple's Y coordinate should overlap with target
     # identifier_tuple's rX coordinate should be the closest to the rx of the target
     connectedSets = [identifier_set]
     for dataSet in self.extractedInfo:
-      lX, rX, tY, bY = self.getCoordinatesFromData(connectedSets[-1])
-      t_lX, t_rX, t_tY, t_bY = self.getCoordinatesFromData(dataSet)
-      if self.sameTuple(tY, bY ,lX, rX, t_tY, t_bY, t_lX, t_rX):
+      lX, rX, tY, bY = self._getCoordinatesFromData(connectedSets[-1])
+      t_lX, t_rX, t_tY, t_bY = self._getCoordinatesFromData(dataSet)
+      if self._sameTuple(tY, bY ,lX, rX, t_tY, t_bY, t_lX, t_rX):
         continue
       else:
-        if self.xConnected(lX, rX, t_lX, t_rX) and self.yOverlap(tY, bY, t_tY, t_bY):
+        if self._xConnected(lX, rX, t_lX, t_rX) and self._yOverlap(tY, bY, t_tY, t_bY):
           connectedSets.append(dataSet)
-    return self.connectText(connectedSets)
+    return self._connectText(connectedSets)
 
-  def closestBelow(self, identifier_tuple):
+  def _closestBelow(self, identifier_tuple):
     # identifier_tuple's X coordinate should overlap with target
     # identifier_tuple's bY coordinate should be the closest to the tY of the target
     connectedSets = [identifier_tuple]
     for dataSet in self.extractedInfo:
-      lX, rX, tY, bY = self.getCoordinatesFromData(connectedSets[-1])
-      t_lX, t_rX, t_tY, t_bY = self.getCoordinatesFromData(dataSet)
-      if self.sameTuple(tY, bY ,lX, rX, t_tY, t_bY, t_lX, t_rX):
+      lX, rX, tY, bY = self._getCoordinatesFromData(connectedSets[-1])
+      t_lX, t_rX, t_tY, t_bY = self._getCoordinatesFromData(dataSet)
+      if self._sameTuple(tY, bY ,lX, rX, t_tY, t_bY, t_lX, t_rX):
         continue
       else:
-        if self.yConnected(tY, bY, t_tY, t_bY) and self.xOverlap(lX, rX, t_lX, t_rX):
+        if self._yConnected(tY, bY, t_tY, t_bY) and self._xOverlap(lX, rX, t_lX, t_rX):
           connectedSets.append(dataSet)
-    return self.connectText(connectedSets)
+    return self._connectText(connectedSets)
 
-  def sameTuple(self, tY, bY ,lX, rX, t_tY, t_bY, t_lX, t_rX) -> bool:
+  def _sameTuple(self, tY, bY ,lX, rX, t_tY, t_bY, t_lX, t_rX) -> bool:
     if t_lX == lX and t_rX == rX and t_tY == tY and t_bY == bY :
       return True
 
-  def yOverlap(self, tY, bY, t_tY, t_bY) -> bool:
+  def _yOverlap(self, tY, bY, t_tY, t_bY) -> bool:
     if (tY <= t_tY and tY >= t_bY) or \
       (bY <= t_tY and bY >= t_bY) or \
       (t_bY <= tY and t_bY >= bY) or \
@@ -78,13 +78,13 @@ class ParseText:
     else:
       return False
 
-  def xConnected(self, lX, rX, t_lX, t_rX) -> bool:
+  def _xConnected(self, lX, rX, t_lX, t_rX) -> bool:
     if t_lX > lX and t_rX > rX and t_lX - rX <= self.MAX and t_lX - rX>= self.MIN:
       return True
     else:
       return False
 
-  def xOverlap(self, lX, rX, t_lX, t_rX) -> bool:
+  def _xOverlap(self, lX, rX, t_lX, t_rX) -> bool:
     if (rX <= t_rX and rX >= t_lX) or \
       (lX <= t_rX  and lX >= t_lX) or \
       (t_rX <= rX and t_rX >= lX) or \
@@ -93,78 +93,78 @@ class ParseText:
     else:
       return False
 
-  def yConnected(self, tY, bY, t_tY, t_bY) -> bool:
+  def _yConnected(self, tY, bY, t_tY, t_bY) -> bool:
     if t_tY < tY and t_bY < bY and bY - t_tY <= self.MAX and bY - t_tY >= self.MIN:
       return True
     else:
       return False
 
-  def getDate(self, text):
+  def _getDate(self, text):
     return re.search(r'\d{2}/\d{2}/\d{4}', text)
 
-  def connectText(self, dataSets) -> str:
+  def _connectText(self, dataSets) -> str:
     result = ''
     for dataSet in dataSets:
       result = result + dataSet['text']
     return result
 
-  def stringsStartWithPrefix(self, prefix) -> list:
+  def _stringsStartWithPrefix(self, prefix) -> list:
     strings = []
-    dataSets = self.findTuplesWithPrefix(prefix)
+    dataSets = self._findTuplesWithPrefix(prefix)
     for dataSet in dataSets:
-      strings.append(self.connectedOnTheRight(dataSet))
+      strings.append(self._connectedOnTheRight(dataSet))
     return strings
 
-  def noTextBoxOnTheLeft(self, targetDataSet):
-    t_lX, t_rX, t_tY, t_bY = self.getCoordinatesFromData(targetDataSet)
+  def _noTextBoxOnTheLeft(self, targetDataSet):
+    t_lX, t_rX, t_tY, t_bY = self._getCoordinatesFromData(targetDataSet)
     for dataSet in self.extractedInfo:
-      lX, rX, tY, bY = self.getCoordinatesFromData(dataSet)
-      if self.xConnected(lX, rX, t_lX, t_rX) and self.yOverlap(tY, bY, t_tY, t_bY):
+      lX, rX, tY, bY = self._getCoordinatesFromData(dataSet)
+      if self._xConnected(lX, rX, t_lX, t_rX) and self._yOverlap(tY, bY, t_tY, t_bY):
         return False
     return True
 
-  def getIssueDate(self):
-    potential_matches = self.stringsStartWithPrefix('4a')
+  def _getIssueDate(self):
+    potential_matches = self._stringsStartWithPrefix('4a')
     for el in potential_matches:
-      match = self.getDate(el)
+      match = self._getDate(el)
       if match:
         return match.group()
 
-  def getExpirationDate(self):
-    potential_matches = self.stringsStartWithPrefix('4b')
+  def _getExpirationDate(self):
+    potential_matches = self._stringsStartWithPrefix('4b')
     for el in potential_matches:
-      match = self.getDate(el)
+      match = self._getDate(el)
       if match:
         return match.group()
 
-  def getFirstName(self):
-    potential_matches = self.stringsStartWithPrefix('1')
+  def _getFirstName(self):
+    potential_matches = self._stringsStartWithPrefix('1')
     for el in potential_matches:
       match = re.search(r'^\d{1}[A-Z ]', el)
       if match:
         return el[1:].strip()
 
-  def getLastName(self):
-    potential_matches = self.stringsStartWithPrefix('2')
+  def _getLastName(self):
+    potential_matches = self._stringsStartWithPrefix('2')
     for el in potential_matches:
       match = re.search(r'^\d{1}[A-Z ]', el)
       if match:
         return el[1:].strip()
 
-  def getAddressFirstLine(self):
-    potential_matches = self.stringsStartWithPrefix('8')
+  def _getAddressFirstLine(self):
+    potential_matches = self._stringsStartWithPrefix('8')
     # need to add code to take out potential bad matches
     return potential_matches[0][1:].strip()
 
-  def getAddressSecondLine(self):
+  def _getAddressSecondLine(self):
     addressOne = None
     for el in self.extractedInfo:
       if self.addressOne in el['text']:
         addressOne = el
         break
-    t_lX, t_rX, t_tY, t_bY = self.getCoordinatesFromData(addressOne)
+    t_lX, t_rX, t_tY, t_bY = self._getCoordinatesFromData(addressOne)
     for el in self.extractedInfo:
-      lX, rX, tY, bY = self.getCoordinatesFromData(el)
-      if self.xOverlap(lX, rX, t_lX, t_rX) and self.yConnected(tY, bY, t_tY, t_bY):
-        addressTwo = self.connectedOnTheRight(el)
+      lX, rX, tY, bY = self._getCoordinatesFromData(el)
+      if self._xOverlap(lX, rX, t_lX, t_rX) and self._yConnected(tY, bY, t_tY, t_bY):
+        addressTwo = self._connectedOnTheRight(el)
         return addressTwo.strip()

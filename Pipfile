@@ -13,6 +13,8 @@ numpy = "*"
 django = "*"
 tensorflow = "*"
 django-cors-headers = "*"
+pybase64 = "*"
+pillow = "*"
 
 [dev-packages]
 
