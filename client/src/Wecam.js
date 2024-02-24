@@ -43,7 +43,14 @@ function WebcamImage() {
           <img src={img} alt="screenshot" />
           <button onClick={() => setImg(null)}>Recapture</button>
           <button onClick={() => sendImg()}>Send</button>
-          <p>Address:{data.address}</p>
+          <p>
+            Address: {data.addressOne} {data.addressTwo}
+          </p>
+          <p>
+            Name: {data.first_name} {data.last_name}
+          </p>
+          <p>Issue Date: {data.issue_date}</p>
+          <p>Expiration Date: {data.expiration_date}</p>
         </>
       )}
     </div>

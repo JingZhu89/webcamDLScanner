@@ -1,7 +1,7 @@
 import easyocr
 import keras_ocr
 from abc import ABC, abstractmethod
-
+from preProcessor import PreProcessor
 class OCR(ABC):
   def __init__(self, path) -> None:
     self.path = path
@@ -39,8 +39,6 @@ class KerasOCR(OCR):
       data = {'coordinate': tuple[1], 'text': tuple[0], 'confidence': None}
       result.append(data)
     return result
-
-
 
 
 

@@ -10,11 +10,11 @@ deskew = "*"
 scipy = "*"
 opencv-python = "*"
 numpy = "*"
-django = "*"
 tensorflow = "*"
-django-cors-headers = "*"
 pybase64 = "*"
 pillow = "*"
+flask = "*"
+flask-cors = "*"
 
 [dev-packages]
 

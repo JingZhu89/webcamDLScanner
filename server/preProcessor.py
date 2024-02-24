@@ -16,6 +16,12 @@ class PreProcessor:
     self._grayScale()
     self._thresholding()
 
+  def cleanupFiles(self):
+    my_dir = BASE_PATH
+    for fname in os.listdir(my_dir):
+      if self.imgName in fname:
+        os.remove(os.path.join(my_dir, fname))
+
   def _normalize(self):
     norm_img = np.zeros((self.img.shape[0], self.img.shape[1]))
     self.img = cv2.normalize(self.img, norm_img, 0, 255, cv2.NORM_MINMAX)
@@ -59,8 +65,3 @@ class PreProcessor:
   def _extractFileName(self):
     return os.path.basename(self.originalImgPath).split('/')[-1].split('.')[0]
 
-  def cleanupFiles(self):
-    my_dir = BASE_PATH
-    for fname in os.listdir(my_dir):
-      if self.imgName in fname:
-        os.remove(os.path.join(my_dir, fname))

@@ -15,12 +15,23 @@ class ParseText:
     self.MIN = min
     self.MAX = max
     self.extractedInfo = extractedInfo
-    self.issueDate = self._getIssueDate()
-    self.expirationDate = self._getExpirationDate()
-    self.firstName = self._getFirstName()
-    self.lastName = self._getLastName()
-    self.addressOne = self._getAddressFirstLine()
-    self.addressTwo = self._getAddressSecondLine()
+
+  def parseData(self):
+    issueDate = self._getIssueDate()
+    expirationDate = self._getExpirationDate()
+    firstName = self._getFirstName()
+    lastName = self._getLastName()
+    addressOne = self._getAddressFirstLine()
+    addressTwo = self._getAddressSecondLine(addressOne)
+    extractedData = {
+                      'issue_date': issueDate,
+                      'expiration_date': expirationDate,
+                      'first_name': firstName,
+                      'last_name': lastName,
+                      'addressOne': addressOne,
+                      'addressTwo' : addressTwo
+                    }
+    return extractedData
 
   def _findTuplesWithPrefix(self, prefix):
     result = []
@@ -37,7 +48,7 @@ class ParseText:
     bY = (bottomLeft[1] + bottomRight[1])/2
     return [lX, rX, tY, bY]
 
-  def _connectedOnTheRight(self, identifier_set):
+  def _connectWithTextOnTheRight(self, identifier_set):
     # identifier_tuple's Y coordinate should overlap with target
     # identifier_tuple's rX coordinate should be the closest to the rx of the target
     connectedSets = [identifier_set]
@@ -51,7 +62,7 @@ class ParseText:
           connectedSets.append(dataSet)
     return self._connectText(connectedSets)
 
-  def _closestBelow(self, identifier_tuple):
+  def _connectWithTextBelow(self, identifier_tuple):
     # identifier_tuple's X coordinate should overlap with target
     # identifier_tuple's bY coordinate should be the closest to the tY of the target
     connectedSets = [identifier_tuple]
@@ -112,7 +123,7 @@ class ParseText:
     strings = []
     dataSets = self._findTuplesWithPrefix(prefix)
     for dataSet in dataSets:
-      strings.append(self._connectedOnTheRight(dataSet))
+      strings.append(self._connectWithTextOnTheRight(dataSet))
     return strings
 
   def _noTextBoxOnTheLeft(self, targetDataSet):
@@ -154,17 +165,19 @@ class ParseText:
   def _getAddressFirstLine(self):
     potential_matches = self._stringsStartWithPrefix('8')
     # need to add code to take out potential bad matches
+    if len(potential_matches) == 0 : return None
     return potential_matches[0][1:].strip()
 
-  def _getAddressSecondLine(self):
-    addressOne = None
+  def _getAddressSecondLine(self, addressOne):
+    addressOneObject = None
     for el in self.extractedInfo:
-      if self.addressOne in el['text']:
-        addressOne = el
+      if addressOne in el['text']:
+        addressOneObject = el
         break
-    t_lX, t_rX, t_tY, t_bY = self._getCoordinatesFromData(addressOne)
+    if addressOneObject == None: return None
+    t_lX, t_rX, t_tY, t_bY = self._getCoordinatesFromData(addressOneObject)
     for el in self.extractedInfo:
       lX, rX, tY, bY = self._getCoordinatesFromData(el)
       if self._xOverlap(lX, rX, t_lX, t_rX) and self._yConnected(tY, bY, t_tY, t_bY):
-        addressTwo = self._connectedOnTheRight(el)
+        addressTwo = self._connectWithTextOnTheRight(el)
         return addressTwo.strip()

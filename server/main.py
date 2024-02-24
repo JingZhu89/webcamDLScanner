@@ -1,5 +1,4 @@
 from flask import Flask, request, redirect
-
 from flask_cors import CORS
 from extract import EasyOCR, KerasOCR
 from preProcessor import PreProcessor
@@ -17,14 +16,8 @@ def processDL():
     # out_jpg.save('test_images/me.jpg')
     myPorcessor = PreProcessor('test_images/missouri.webp')
     easy = EasyOCR(myPorcessor.grayScaleImgPath)
-    extractedData = ParseText(easy.MIN, easy.MAX, easy.extract())
-    data =  {
-              'first_name': extractedData.firstName,
-              'last_name': extractedData.lastName,
-              'address': extractedData.addressOne + ' ' + extractedData.addressTwo,
-              'issue_date': extractedData.issueDate,
-              'expiration_date': extractedData.expirationDate
-            }
+    parse = ParseText(easy.MIN, easy.MAX, easy.extract())
+    data =  parse.parseData()
     print(data)
     myPorcessor.cleanupFiles()
     return data
