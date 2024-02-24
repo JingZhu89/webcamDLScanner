@@ -17,13 +17,20 @@ class EasyOCR(OCR):
     super().__init__(path)
 
   def extract(self):
-    result = []
+      self._getRawData()
+      return self._formatRawData()
+
+  def _getRawData(self):
     reader = easyocr.Reader(['en'], gpu = True)
-    extracted_info = reader.readtext(self.path, min_size = 1)
-    for tuple in extracted_info:
+    self.rawData = reader.readtext(self.path, min_size = 1)
+
+  def _formatRawData(self):
+    result = []
+    for tuple in self.rawData:
       data = {'coordinate': tuple[0], 'text': tuple[1], 'confidence':tuple[2]}
       result.append(data)
     return result
+
 
 class KerasOCR(OCR):
   MIN = -8
@@ -32,13 +39,18 @@ class KerasOCR(OCR):
     super().__init__(path)
 
   def extract(self):
-    result = []
+    self._getRawData()
+    return self._formatRawData()
+
+  def _getRawData(self):
     pipeline = keras_ocr.pipeline.Pipeline()
-    extracted_info = pipeline.recognize([self.path])
-    for tuple in extracted_info[0]:
-      data = {'coordinate': tuple[1], 'text': tuple[0], 'confidence': None}
+    self.rawData = pipeline.recognize([self.path])[0]
+
+  def _formatRawData(self):
+    result = []
+    for tuple in self.rawData:
+      data = {'coordinate': tuple[1][0], 'text': tuple[0], 'confidence': None}
       result.append(data)
     return result
-
 
 
