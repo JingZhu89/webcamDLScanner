@@ -1,12 +1,14 @@
-import WebcamImage from "./Wecam";
-import Fields from "./Fields";
 import React from "react";
 import { useState } from "react";
+import WebcamImage from "./Wecam";
+import Fields from "./Fields";
+import Upload from "./Upload";
 import { Grid, Tab, Tabs, Typography } from "@mui/material";
 
 function App() {
   const [tab, setTab] = useState(0);
   const [webcamImg, setWebCamImg] = useState(null);
+  const [uploadedImg, setUploadedImg] = useState({ preview: null, data: null });
   const [data, setData] = useState({
     issue_date: "",
     expiration_date: "",
@@ -14,9 +16,16 @@ function App() {
     last_name: "",
     address: "",
   });
-
   const handleWebCamImgChange = (newImg) => {
     setWebCamImg(newImg);
+  };
+
+  const handleUploadedImgChange = (e) => {
+    const img = {
+      preview: URL.createObjectURL(e.target.files[0]),
+      data: e.target.files[0],
+    };
+    setUploadedImg(img);
   };
 
   const handleDataChange = (newData) => {
@@ -81,7 +90,12 @@ function App() {
         </Tabs>
       </Grid>
       <Grid xs={12} md={6} item>
-        {tab === 0 ? null : (
+        {tab === 0 ? (
+          <Upload
+            imgHander={handleUploadedImgChange}
+            img={uploadedImg.preview}
+          />
+        ) : (
           <WebcamImage imgHandler={handleWebCamImgChange} img={webcamImg} />
         )}
       </Grid>
@@ -91,6 +105,7 @@ function App() {
           data={data}
           currentTab={tab}
           webcamImg={webcamImg}
+          uploadedImg={uploadedImg}
         />
       </Grid>
     </Grid>

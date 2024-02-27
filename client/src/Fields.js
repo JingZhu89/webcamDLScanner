@@ -3,7 +3,7 @@ import useField from "./fieldsHook";
 import { Grid, TextField, Button, Typography } from "@mui/material";
 import { getParsedData } from "./api";
 
-function Fields({ data, currentTab, dataHandler, webcamImg }) {
+function Fields({ data, currentTab, dataHandler, webcamImg, uploadedImg }) {
   let addressPrefix = useField("addressPrefix");
   let firstNamePrefix = useField("firstNamePrefix");
   let lastNamePrefix = useField("lastNamePrefix");
@@ -16,7 +16,7 @@ function Fields({ data, currentTab, dataHandler, webcamImg }) {
     let img;
     if (currentTab === 0) {
       type = "upload";
-      img = "";
+      img = uploadedImg;
     } else {
       type = "webcam";
       img = webcamImg;
@@ -38,7 +38,7 @@ function Fields({ data, currentTab, dataHandler, webcamImg }) {
 
   return (
     <Grid container>
-      <Grid xs={12}>
+      <Grid xs={12} item>
         <Button
           sx={{ marginTop: "30px" }}
           size="medium"
