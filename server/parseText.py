@@ -169,6 +169,7 @@ class ParseText:
     return potential_matches[0][1:].strip()
 
   def _getAddressSecondLine(self, addressOne):
+    if addressOne == None: return None
     addressOneObject = None
     for el in self.extractedInfo:
       if addressOne in el['text']:

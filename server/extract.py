@@ -2,6 +2,7 @@ import easyocr
 import keras_ocr
 from abc import ABC, abstractmethod
 from preProcessor import PreProcessor
+
 class OCR(ABC):
   def __init__(self, path) -> None:
     self.path = path

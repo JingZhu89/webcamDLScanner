@@ -25,7 +25,8 @@ class PreProcessor:
         os.remove(os.path.join(my_dir, fname))
 
   def _readImage(self):
-    self.img = cv2.imread(self.originalImgPath)
+    img = cv2.imread(self.originalImgPath)
+    self.img = cv2.flip(img, 1)
     if self.img is None:
       raise PreProcessorExceptions("unable to read image file")
 
@@ -90,5 +91,4 @@ class PreProcessor:
   def _extractFileName(self):
     return os.path.basename(self.originalImgPath).split('/')[-1].split('.')[0]
 
-object = PreProcessor('test_images/missouri.webp')
 

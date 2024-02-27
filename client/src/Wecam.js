@@ -18,8 +18,8 @@ function WebcamImage() {
   };
 
   const videoConstraints = {
-    width: 390,
-    height: 390,
+    width: 360,
+    height: 200,
     facingMode: "user",
   };
 
