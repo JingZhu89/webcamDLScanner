@@ -1,26 +1,19 @@
 import Webcam from "react-webcam";
 import React, { useState, useRef, useCallback } from "react";
-import { getParsedData } from "./api";
-import { Grid, Button, Box, Container } from "@mui/material";
-function WebcamImage() {
+import { Grid, Button, Box } from "@mui/material";
+
+function WebcamImage({ imgHandler, img }) {
   let [webcamOn, setWebcamOn] = useState(false);
   const webcamRef = useRef(null);
-  const [img, setImg] = useState(null);
-  const [data, setData] = useState({});
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
-    setImg(imageSrc);
-  }, [webcamRef]);
-
-  const sendImg = async () => {
-    const data = await getParsedData(img);
-    setData(data);
-  };
+    imgHandler(imageSrc);
+  }, [webcamRef, imgHandler]);
 
   const videoConstraints = {
-    width: 360,
-    height: 200,
+    width: 720,
+    height: 400,
     facingMode: "user",
   };
 
@@ -29,13 +22,38 @@ function WebcamImage() {
       container
       sx={{
         justifyContent: "center",
-        alignItems: "center",
       }}
     >
       <Grid xs={12} item sx={{ textAlign: "center" }}>
-        <Button onClick={(e) => setWebcamOn(!webcamOn)}>
+        <Button
+          sx={{ marginTop: "30px" }}
+          size="medium"
+          variant="contained"
+          onClick={(e) => setWebcamOn(!webcamOn)}
+        >
           {webcamOn ? "Turn Off Camera" : "Turn On Camera"}
         </Button>
+        {img !== null ? (
+          <Button
+            sx={{ marginTop: "30px", marginLeft: "5px" }}
+            variant="contained"
+            size="medium"
+            onClick={() => imgHandler(null)}
+          >
+            Recapture
+          </Button>
+        ) : null}
+
+        {webcamOn && img === null ? (
+          <Button
+            variant="contained"
+            size="medium"
+            sx={{ marginTop: "30px", marginLeft: "5px" }}
+            onClick={capture}
+          >
+            Capture photo
+          </Button>
+        ) : null}
       </Grid>
 
       {img === null && webcamOn ? (
@@ -47,18 +65,26 @@ function WebcamImage() {
           }}
         >
           <Grid xs={12} item textAlign="center">
-            <Webcam
-              screenshotFormat="image/jpeg"
-              videoConstraints={videoConstraints}
-              audio={false}
-              height={400}
-              width={720}
-              ref={webcamRef}
-              mirrored={true}
-            />
-          </Grid>
-          <Grid xs={12} item textAlign="center">
-            <Button onClick={capture}>Capture photo</Button>
+            <Box
+              textAlign="center"
+              sx={{
+                border: 10,
+                borderRadius: 5,
+                margin: 5,
+                borderColor: "lightgray",
+              }}
+            >
+              <Webcam
+                screenshotFormat="image/jpeg"
+                videoConstraints={videoConstraints}
+                audio={false}
+                height="100%"
+                width="100%"
+                ref={webcamRef}
+                mirrored={false}
+                borderRadius="5"
+              />
+            </Box>
           </Grid>
         </Grid>
       ) : (
@@ -69,18 +95,46 @@ function WebcamImage() {
             alignItems: "center",
           }}
         >
-          {!webcamOn && img === null ? (
+          {!webcamOn || img === null ? (
             <Grid xs={12} item textAlign="center">
-              <img src="/camera.jpeg" alt="camera" height={400} width={720} />{" "}
+              <Box
+                textAlign="center"
+                sx={{
+                  border: 10,
+                  borderRadius: 5,
+                  margin: 5,
+                  borderColor: "lightgray",
+                }}
+              >
+                <img
+                  src="/camera.jpeg"
+                  alt="camera"
+                  height="100%"
+                  width="100%"
+                  borderRadius="5"
+                />
+              </Box>
             </Grid>
           ) : (
             <Grid container>
               <Grid xs={12} item textAlign="center">
-                <img src={img} alt="screenshot" height={400} width={720} />
-              </Grid>
-              <Grid xs={12} item textAlign="center">
-                <Button onClick={() => setImg(null)}>Recapture</Button>
-                <Button onClick={() => sendImg()}>Send</Button>
+                <Box
+                  textAlign="center"
+                  sx={{
+                    border: 10,
+                    borderRadius: 5,
+                    margin: 5,
+                    borderColor: "lightgray",
+                  }}
+                >
+                  <img
+                    src={img}
+                    alt="screenshot"
+                    height="100%"
+                    width="100%"
+                    borderRadius="5"
+                  />
+                </Box>
               </Grid>
             </Grid>
           )}

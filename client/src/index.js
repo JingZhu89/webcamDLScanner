@@ -75,6 +75,7 @@ const theme = createTheme({
           style: {
             backgroundColor: "#3c4bcb",
             textTransform: "capitalize",
+            minWidth: "140px",
             fontSize: "16px",
             "&:hover": {
               backgroundColor: "#2433B2",

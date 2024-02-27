@@ -25,8 +25,7 @@ class PreProcessor:
         os.remove(os.path.join(my_dir, fname))
 
   def _readImage(self):
-    img = cv2.imread(self.originalImgPath)
-    self.img = cv2.flip(img, 1)
+    self.img = cv2.imread(self.originalImgPath)
     if self.img is None:
       raise PreProcessorExceptions("unable to read image file")
 

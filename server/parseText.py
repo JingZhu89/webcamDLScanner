@@ -1,22 +1,13 @@
 import re
 
-PREFIX = {
-          'Issue_Date' : '4a',
-          'DL_Number': '4d',
-          'Expiration': '4b',
-          'First_Name': '1',
-          'Last_Name': '2' ,
-          'DOB': '3',
-          'Address': '8'
-         }
-
 class ParseText:
   def __init__(self, min, max, extractedInfo) -> None:
     self.MIN = min
     self.MAX = max
     self.extractedInfo = extractedInfo
 
-  def parseData(self):
+  def parseData(self, prefix):
+    self.prefix = prefix
     issueDate = self._getIssueDate()
     expirationDate = self._getExpirationDate()
     firstName = self._getFirstName()
@@ -28,8 +19,8 @@ class ParseText:
                       'expiration_date': expirationDate,
                       'first_name': firstName,
                       'last_name': lastName,
-                      'addressOne': addressOne,
-                      'addressTwo' : addressTwo
+                      'address_one': addressOne,
+                      'address_two' : addressTwo
                     }
     return extractedData
 
@@ -135,35 +126,35 @@ class ParseText:
     return True
 
   def _getIssueDate(self):
-    potential_matches = self._stringsStartWithPrefix('4a')
+    potential_matches = self._stringsStartWithPrefix(self.prefix['issue_date'])
     for el in potential_matches:
       match = self._getDate(el)
       if match:
         return match.group()
 
   def _getExpirationDate(self):
-    potential_matches = self._stringsStartWithPrefix('4b')
+    potential_matches = self._stringsStartWithPrefix(self.prefix['expiration_date'])
     for el in potential_matches:
       match = self._getDate(el)
       if match:
         return match.group()
 
   def _getFirstName(self):
-    potential_matches = self._stringsStartWithPrefix('1')
+    potential_matches = self._stringsStartWithPrefix(self.prefix['first_name'])
     for el in potential_matches:
       match = re.search(r'^\d{1}[A-Z ]', el)
       if match:
         return el[1:].strip()
 
   def _getLastName(self):
-    potential_matches = self._stringsStartWithPrefix('2')
+    potential_matches = self._stringsStartWithPrefix(self.prefix['last_name'])
     for el in potential_matches:
       match = re.search(r'^\d{1}[A-Z ]', el)
       if match:
         return el[1:].strip()
 
   def _getAddressFirstLine(self):
-    potential_matches = self._stringsStartWithPrefix('8')
+    potential_matches = self._stringsStartWithPrefix(self.prefix['address'])
     # need to add code to take out potential bad matches
     if len(potential_matches) == 0 : return None
     return potential_matches[0][1:].strip()
@@ -182,3 +173,4 @@ class ParseText:
       if self._xOverlap(lX, rX, t_lX, t_rX) and self._yConnected(tY, bY, t_tY, t_bY):
         addressTwo = self._connectWithTextOnTheRight(el)
         return addressTwo.strip()
+

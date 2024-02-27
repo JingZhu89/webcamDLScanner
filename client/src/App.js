@@ -2,9 +2,45 @@ import WebcamImage from "./Wecam";
 import Fields from "./Fields";
 import React from "react";
 import { useState } from "react";
-import { Grid, Button, Tab, Tabs, TextField, Box } from "@mui/material";
+import { Grid, Tab, Tabs, Typography } from "@mui/material";
+
 function App() {
   const [tab, setTab] = useState(0);
+  const [webcamImg, setWebCamImg] = useState(null);
+  const [data, setData] = useState({
+    issue_date: "",
+    expiration_date: "",
+    first_name: "",
+    last_name: "",
+    address: "",
+  });
+
+  const handleWebCamImgChange = (newImg) => {
+    setWebCamImg(newImg);
+  };
+
+  const handleDataChange = (newData) => {
+    let data = {};
+    for (const key in newData) {
+      if (key !== "address_one" && key !== "address_two" && !newData[key]) {
+        data[key] = "Unable to parse data";
+      } else if (key !== "address_one" && key !== "address_two") {
+        data[key] = newData[key];
+      }
+    }
+    if (newData["address_one"] !== null) {
+      data["address"] = newData["address_one"];
+    } else {
+      data["address"] = "Unable to parse address line 1";
+    }
+    if (newData["address_two"] !== null) {
+      data["address"] = data["address"] + ", " + newData["address_two"];
+    } else {
+      data["address"] =
+        data["address"] + ", " + " Unable to parse address line 2";
+    }
+    setData(data);
+  };
 
   const handleTabChange = React.useCallback((e, newValue) => {
     setTab(newValue);
@@ -22,10 +58,10 @@ function App() {
       container
       sx={{
         justifyContent: "center",
-        alignItems: "center",
       }}
     >
-      <Grid xs={12} md={6} item>
+      <Grid xs={12} item textAlign="center">
+        <Typography variant="h2">Driver's License Reader App</Typography>
         <Tabs
           value={tab}
           onChange={handleTabChange}
@@ -43,10 +79,19 @@ function App() {
             sx={{ textTransform: "capitalize" }}
           />
         </Tabs>
-        {tab === 0 ? null : <WebcamImage />}
       </Grid>
       <Grid xs={12} md={6} item>
-        <Fields />
+        {tab === 0 ? null : (
+          <WebcamImage imgHandler={handleWebCamImgChange} img={webcamImg} />
+        )}
+      </Grid>
+      <Grid xs={12} md={6} item>
+        <Fields
+          dataHandler={handleDataChange}
+          data={data}
+          currentTab={tab}
+          webcamImg={webcamImg}
+        />
       </Grid>
     </Grid>
   );
