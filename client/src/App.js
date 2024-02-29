@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import WebcamImage from "./Wecam";
+import WebcamImage from "./Webcam";
 import Fields from "./Fields";
 import Upload from "./Upload";
 import { getParsedData } from "./api";
@@ -16,7 +16,7 @@ const DEFAULT_DATA = {
 };
 
 function App() {
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState(1);
   const [webcamImg, setWebCamImg] = useState(null);
   const [uploadedImg, setUploadedImg] = useState({ preview: null, data: null });
   const [error, setError] = useState("");

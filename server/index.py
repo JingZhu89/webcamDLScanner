@@ -1,5 +1,5 @@
 from asyncio import constants
-from flask import Flask, request, redirect
+from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from extract import EasyOCR, KerasOCR
 from preProcessor import PreProcessor
@@ -61,6 +61,12 @@ def processData(type):
     myPorcessor.cleanupFiles()
     returnData = parse.parseData()
     return returnData
+
+
+def getRawData(path, type):
+    myPorcessor = PreProcessor(path, type)
+    easy = EasyOCR(myPorcessor.grayScaleImgPath)
+    return easy.extract()
 
 
 def handleError(e):

@@ -1,4 +1,4 @@
-import { Grid, Box, Input } from "@mui/material";
+import { Grid, Box, Input, InputLabel } from "@mui/material";
 
 function Upload({ imgHander, img }) {
   return (
@@ -9,7 +9,8 @@ function Upload({ imgHander, img }) {
       }}
     >
       <Grid xs={12} item textAlign="center">
-        <Input type="file" borderRadius="5" onChange={imgHander} />
+        <InputLabel htmlFor="fileInput">Upload DL License Here</InputLabel>
+        <Input type="file" onChange={imgHander} id="fileInput" />
         <Box
           textAlign="center"
           sx={{
@@ -20,19 +21,12 @@ function Upload({ imgHander, img }) {
           }}
         >
           {img ? (
-            <img
-              src={img}
-              height="100%"
-              width="100%"
-              borderRadius="5"
-              alt="uploaded"
-            />
+            <img src={img} height="100%" width="100%" alt="uploaded" />
           ) : (
             <img
               src={"/upload.jpeg"}
               height="100%"
               width="100%"
-              borderRadius="5"
               alt="uploaded"
             />
           )}

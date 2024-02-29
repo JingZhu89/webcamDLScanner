@@ -91,7 +91,6 @@ function WebcamImage({ imgHandler, img }) {
                 width="100%"
                 ref={webcamRef}
                 mirrored={true}
-                borderRadius="5"
               />
             </Box>
           </Grid>
@@ -120,7 +119,6 @@ function WebcamImage({ imgHandler, img }) {
                   alt="camera"
                   height="100%"
                   width="100%"
-                  borderRadius="5"
                 />
               </Box>
             </Grid>
@@ -136,13 +134,7 @@ function WebcamImage({ imgHandler, img }) {
                     borderColor: "lightgray",
                   }}
                 >
-                  <img
-                    src={img}
-                    alt="screenshot"
-                    height="100%"
-                    width="100%"
-                    borderRadius="5"
-                  />
+                  <img src={img} alt="screenshot" height="100%" width="100%" />
                 </Box>
               </Grid>
             </Grid>

@@ -3,7 +3,7 @@ import re
 import json
 from extract import EasyOCR
 from preProcessor import PreProcessor
-from config import STATES, STATE_PREFIX, STATE_COORDINATES, STATE_DEVIATIONS
+from appConfig import STATES, STATE_COORDINATES, STATE_DEVIATIONS
 from customException import TextParserExceptions
 
 
@@ -117,9 +117,9 @@ class ParseText:
         if len(matched) > 1 or len(matched) == 0:
             raise TextParserExceptions(
                 additionalMsg='Unable to parse out state')
-        if matched[0]['state'] != 'MISSOURI':
+        if matched[0]['state'] not in STATE_DEVIATIONS or matched[0]['state'] not in STATE_COORDINATES:
             raise TextParserExceptions(
-                additionalMsg='Currently I only support Missouri DL')
+                additionalMsg='This state is not supported, add it to appConfig if you want to support this state')
         else:
             self.state = matched[0]
             self.devX = STATE_DEVIATIONS[self.state['state']]['devX']
