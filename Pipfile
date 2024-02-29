@@ -16,6 +16,7 @@ pillow = "*"
 flask = "*"
 flask-cors = "*"
 scikit-image = "*"
+gunicorn = "*"
 
 [dev-packages]
 
