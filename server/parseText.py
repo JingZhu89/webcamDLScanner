@@ -1,13 +1,18 @@
 import re
-
+import json
+from extract import easyocr
+from preProcessor import PreProcessor
+from config import STATES, STATE_PREFIX
+from customException import TextParserExceptions
 class ParseText:
   def __init__(self, min, max, extractedInfo) -> None:
     self.MIN = min
     self.MAX = max
     self.extractedInfo = extractedInfo
+    for el in extractedInfo: print(el)
 
-  def parseData(self, prefix):
-    self.prefix = prefix
+  def parseData(self):
+    self.prefix = self._getPrefix()
     issueDate = self._getIssueDate()
     expirationDate = self._getExpirationDate()
     firstName = self._getFirstName()
@@ -173,4 +178,29 @@ class ParseText:
       if self._xOverlap(lX, rX, t_lX, t_rX) and self._yConnected(tY, bY, t_tY, t_bY):
         addressTwo = self._connectWithTextOnTheRight(el)
         return addressTwo.strip()
+
+  def _findStateName(self):
+    matched = []
+    for el in self.extractedInfo:
+      searchStr = el['text'].upper()
+      if searchStr in STATES and searchStr in STATE_PREFIX:
+          matched.append(searchStr)
+    if len(matched) > 1 or len(matched) == 0:
+      return "DEFAULT"
+    else :
+      return matched[0]
+
+  def _getPrefix(self):
+    state = self._findStateName()
+    return STATE_PREFIX[state]
+
+
+
+# f = open('states.json')
+# data = json.load(f)
+# states = set()
+# for i in range(len(data)):
+#   states.add(data[i]['name'].upper())
+
+# print(states)
 

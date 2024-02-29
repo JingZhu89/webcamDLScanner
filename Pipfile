@@ -15,6 +15,7 @@ pybase64 = "*"
 pillow = "*"
 flask = "*"
 flask-cors = "*"
+scikit-image = "*"
 
 [dev-packages]
 

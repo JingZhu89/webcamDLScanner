@@ -21,7 +21,10 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: ["Inter", "sans-serif"].join(","),
+    fontFamily: ["Arial", "sans-serif"].join(","),
+    allVariants: {
+      color: "#3C4BCB",
+    },
   },
   components: {
     MuiTab: {

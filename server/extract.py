@@ -54,4 +54,8 @@ class KerasOCR(OCR):
       result.append(data)
     return result
 
+pp = PreProcessor("test_images/MO.webp")
+easy = EasyOCR(pp.grayScaleImgPath)
+data = easy.extract()
+for el in data : print(el)
 

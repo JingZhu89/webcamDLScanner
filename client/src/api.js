@@ -19,6 +19,6 @@ export const getParsedData = async (data) => {
     formData.append("prefix", JSON.stringify(data.prefix));
     res = await axios.post(UPLOADURL, formData);
   }
-
+  
   return res.data;
 };

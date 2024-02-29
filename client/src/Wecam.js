@@ -12,8 +12,8 @@ function WebcamImage({ imgHandler, img }) {
   }, [webcamRef, imgHandler]);
 
   const videoConstraints = {
-    width: 720,
-    height: 400,
+    width: 1920,
+    height: 1080,
     facingMode: "user",
   };
 
@@ -76,12 +76,13 @@ function WebcamImage({ imgHandler, img }) {
             >
               <Webcam
                 screenshotFormat="image/jpeg"
+                forceScreenshotSourceSize
                 videoConstraints={videoConstraints}
                 audio={false}
                 height="100%"
                 width="100%"
                 ref={webcamRef}
-                mirrored={false}
+                mirrored={true}
                 borderRadius="5"
               />
             </Box>
