@@ -1,33 +1,38 @@
+from dataclasses import field
 import re
 import json
-from extract import easyocr
+from extract import EasyOCR
 from preProcessor import PreProcessor
-from config import STATES, STATE_PREFIX
+from config import STATES, STATE_PREFIX, STATE_COORDINATES, STATE_DEVIATIONS
 from customException import TextParserExceptions
+
 class ParseText:
-  def __init__(self, min, max, extractedInfo) -> None:
-    self.MIN = min
-    self.MAX = max
+  def __init__(self, extractedInfo) -> None:
     self.extractedInfo = extractedInfo
     for el in extractedInfo: print(el)
 
   def parseData(self):
-    self.prefix = self._getPrefix()
-    issueDate = self._getIssueDate()
-    expirationDate = self._getExpirationDate()
-    firstName = self._getFirstName()
-    lastName = self._getLastName()
-    addressOne = self._getAddressFirstLine()
-    addressTwo = self._getAddressSecondLine(addressOne)
-    extractedData = {
-                      'issue_date': issueDate,
-                      'expiration_date': expirationDate,
-                      'first_name': firstName,
-                      'last_name': lastName,
-                      'address_one': addressOne,
-                      'address_two' : addressTwo
-                    }
-    return extractedData
+    self._findStateName()
+    self._findAllOffsets()
+    self._findAllFields()
+    self._cleanRawData()
+    return self.result
+    # self.prefix = self._getPrefix()
+    # issueDate = self._getIssueDate()
+    # expirationDate = self._getExpirationDate()
+    # firstName = self._getFirstName()
+    # lastName = self._getLastName()
+    # addressOne = self._getAddressFirstLine()
+    # addressTwo = self._getAddressSecondLine(addressOne)
+    # extractedData = {
+    #                   'issue_date': issueDate,
+    #                   'expiration_date': expirationDate,
+    #                   'first_name': firstName,
+    #                   'last_name': lastName,
+    #                   'address_one': addressOne,
+    #                   'address_two' : addressTwo
+    #                 }
+    # return extractedData
 
   def _findTuplesWithPrefix(self, prefix):
     result = []
@@ -86,7 +91,7 @@ class ParseText:
       return False
 
   def _xConnected(self, lX, rX, t_lX, t_rX) -> bool:
-    if t_lX > lX and t_rX > rX and t_lX - rX <= self.MAX and t_lX - rX>= self.MIN:
+    if t_lX > lX and t_rX > rX and t_lX - rX <= self.connectedDisDev and t_lX - rX>= -self.connectedDisDev:
       return True
     else:
       return False
@@ -101,7 +106,7 @@ class ParseText:
       return False
 
   def _yConnected(self, tY, bY, t_tY, t_bY) -> bool:
-    if t_tY < tY and t_bY < bY and bY - t_tY <= self.MAX and bY - t_tY >= self.MIN:
+    if t_tY < tY and t_bY < bY and bY - t_tY <= self.connectedDisDev and bY - t_tY >= -self.connectedDisDev:
       return True
     else:
       return False
@@ -178,21 +183,132 @@ class ParseText:
       if self._xOverlap(lX, rX, t_lX, t_rX) and self._yConnected(tY, bY, t_tY, t_bY):
         addressTwo = self._connectWithTextOnTheRight(el)
         return addressTwo.strip()
+  def _getPrefix(self):
+    state = self._findStateName()
+    return STATE_PREFIX[state]
+
+  # def _findStateName(self):
+  #   matched = []
+  #   for el in self.extractedInfo:
+  #     searchStr = el['text'].upper()
+  #     if searchStr in STATES and searchStr in STATE_PREFIX:
+  #         matched.append(searchStr)
+  #   if len(matched) > 1 or len(matched) == 0:
+  #     return "DEFAULT"
+  #   else :
+  #     return matched[0]
 
   def _findStateName(self):
     matched = []
     for el in self.extractedInfo:
-      searchStr = el['text'].upper()
-      if searchStr in STATES and searchStr in STATE_PREFIX:
-          matched.append(searchStr)
+      searchStr = el['text'].upper().strip()
+      if searchStr in STATES:
+          matched.append({'state':searchStr, 'coordinate' :el['coordinate']})
     if len(matched) > 1 or len(matched) == 0:
-      return "DEFAULT"
+      raise TextParserExceptions(additionalMsg='Unable to parse out state')
+    if matched[0]['state'] != 'MISSOURI':
+      raise TextParserExceptions(additionalMsg='Currently I only support Missouri DL')
     else :
-      return matched[0]
+      self.state = matched[0]
+      self.devX = STATE_DEVIATIONS[self.state['state']]['devX']
+      self.devY = STATE_DEVIATIONS[self.state['state']]['devY']
+      self.connectedDisDev = STATE_DEVIATIONS[self.state['state']]['connectedDisDev']
 
-  def _getPrefix(self):
-    state = self._findStateName()
-    return STATE_PREFIX[state]
+  def _findAllOffsets(self):
+    offsets = {}
+    coordinates = STATE_COORDINATES[self.state['state']]
+    markerCoordinates = coordinates['state']['coordinate']
+    for key in coordinates:
+      if key != 'state':
+        targetCoordinates = coordinates[key]['coordinate']
+        offsets[key] = self._findOffset(markerCoordinates, targetCoordinates)
+    self.offsets = offsets
+
+  def _findOffset(self, markerCoordinates, targetCoordinates):
+    markerPos = self._getPosFromCoordinates(markerCoordinates)
+    targetPos = self._getPosFromCoordinates(targetCoordinates)
+    xLeftOffSet = (targetPos['leftX'] - markerPos['leftX'])/(markerPos['rightX'] - markerPos['leftX'])
+    yMiddleOffSet = ((targetPos['topY'] + targetPos['bottomY'])/2 - \
+              (markerPos['topY'] + markerPos['bottomY'])/2)/(markerPos['topY'] - markerPos['bottomY'])
+    return {'xLeftOffSet' : xLeftOffSet, 'yMiddleOffSet': yMiddleOffSet}
+
+  def _findPosFromOffset(self, clientMarkerCoordinates, offset):
+    markerPos = self._getPosFromCoordinates(clientMarkerCoordinates)
+    targetLeftX = offset['xLeftOffSet'] * (markerPos['rightX'] - markerPos['leftX']) +  markerPos['leftX']
+    targetMiddleY = offset['yMiddleOffSet'] * (markerPos['topY'] - markerPos['bottomY']) + (markerPos['topY'] + markerPos['bottomY'])/2
+    return {'targetLeftX' : targetLeftX, 'targetMiddleY' : targetMiddleY}
+
+  def _getPosFromCoordinates(self, coordinate):
+    bottomLeft, bottomRight, topRight, topLeft = coordinate
+    rightX = (bottomRight[0] + topRight[0])/2
+    leftX = (bottomLeft[0] + topLeft[0])/2
+    topY = (topLeft[1] + topRight[1])/2
+    bottomY = (bottomLeft[1] + bottomRight[1])/2
+    return {'leftX':leftX, 'rightX': rightX, 'topY': topY, 'bottomY':bottomY}
+
+  def _getFieldFromPos(self, targetPos):
+    for el in self.extractedInfo:
+      pos = self._getPosFromCoordinates(el['coordinate'])
+      if pos['leftX'] - self.devX <= targetPos['targetLeftX'] and \
+         pos['leftX'] + self.devX >= targetPos['targetLeftX'] and \
+         pos['topY'] + self.devY >= targetPos['targetMiddleY'] and \
+         pos['bottomY'] - self.devY <= targetPos['targetMiddleY'] :
+         return el
+    return None
+
+  def _findAllFields(self):
+    result = {}
+    marker = self.state['coordinate']
+    offsets = self.offsets
+    for key in offsets:
+      targetPos = self._findPosFromOffset(marker, offsets[key])
+      print(key, targetPos)
+      field = self._getFieldFromPos(targetPos)
+      if field != None:
+        result[key] = self._connectWithTextOnTheRight(field).strip()
+      else:
+        result[key] = None
+    print(result)
+    self.result = result
+
+  def _cleanRawData(self):
+    if self.result['address_one'] != None and \
+    (self.result['address_one'].startswith('0 ') or \
+    self.result['address_one'].startswith('8 ')):
+      self.result['address_one'] = self.result['address_one'][2:].strip()
+
+    if self.result['first_name'] != None and self.result['first_name'][0].isdigit():
+      self.result['first_name'] = self.result['first_name'][1:].strip()
+
+    if self.result['last_name'] != None and self.result['last_name'][0].isdigit():
+      self.result['last_name'] = self.result['last_name'][1:].strip()
+
+    if self.result['issue_date'] != None:
+      self.result['issue_date'] = self._getDate(self.result['issue_date']).group()
+
+    if self.result['expiration_date'] != None:
+      self.result['expiration_date'] = self._getDate(self.result['expiration_date']).group()
+
+
+
+
+
+
+
+# pp = PreProcessor("test_images/MO.webp")
+# easy = EasyOCR(pp.grayScaleImgPath)
+# data = easy.extract()
+# for el in data : print(el)
+# test = ParseText(10, data)
+# test.parseData()
+
+# offset = test._findOffset([[301, 27], [721, 27], [721, 119], [301, 119]],[[305, 287], [655, 287], [655, 325], [305, 325]])
+# pos = test._findDataFromOffset([[301, 27], [721, 27], [721, 119], [301, 119]], offset)
+# print(pos)
+# print(test._getFieldFromPos(pos))
+
+
+
 
 
 

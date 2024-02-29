@@ -9,10 +9,12 @@ from customException import PreProcessorExceptions
 
 BASE_PATH = 'processed_images/'
 class PreProcessor:
-  def __init__(self, path) -> None:
+  def __init__(self, path, type) -> None:
     self.originalImgPath = path
+    self.type = type
     self.imgName = self._extractFileName()
     self._readImage()
+    self._flipImage()
     self._normalize()
     self._skewCorrection()
     self.__reduceBlurry()
@@ -31,19 +33,13 @@ class PreProcessor:
     self.img = cv2.imread(self.originalImgPath)
     if self.img is None:
       raise PreProcessorExceptions(additionalMsg="unable to read image file")
-    # self.img = cv2.flip(self.img, 1)
-    newPath = BASE_PATH + self.imgName + '_flippedImg.jpg'
-    cv2.imwrite(newPath, self.img)
-    self.flippedImgPath = newPath
 
-  # def _imgScaling(self):
-  #   im = Image.open(self.flippedImgPath)
-  #   length_x, width_y = im.size
-  #   factor = min(1, float(1024.0 / length_x))
-  #   size = int(factor * length_x), int(factor * width_y)
-  #   self.img = im.resize(size, Image.Resampling.LANCZOS)
-  #   newPath = BASE_PATH + self.imgName + '_resized.jpg'
-  #   self.img.save(newPath, dpi=(400, 400))
+  def _flipImage(self):
+    if self.type == 'webcam':
+      self.img = cv2.flip(self.img, 1)
+      newPath = BASE_PATH + self.imgName + '_flippedImg.jpg'
+      cv2.imwrite(newPath, self.img)
+      self.flippedImgPath = newPath
 
   def __reduceBlurry(self):
     p2, p98 = np.percentile(self.img, (2, 98))
@@ -115,37 +111,6 @@ class PreProcessor:
   def _extractFileName(self):
     return os.path.basename(self.originalImgPath).split('/')[-1].split('.')[0]
 
-
-def detect_license_coordinates(image_path):
-    image = cv2.imread(image_path)
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    edges = cv2.Canny(blurred, 50, 150)
-    contours, _ = cv2.findContours(edges.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    contour = max(contours, key=cv2.contourArea)
-    epsilon = 0.05 * cv2.arcLength(contour, True)
-    approx = cv2.approxPolyDP(contour, epsilon, True)
-    if len(approx) == 4:
-        cv2.drawContours(image, [approx], -1, (0, 255, 0), 2)
-        coordinates = [tuple(point[0]) for point in approx]
-        print(coordinates)
-        return coordinates, image
-    else:
-        print("Error: Unable to detect the license.")
-        return None, image
-
-if __name__ == "__main__":
-    input_image_path = "test_images/MO.webp"
-    
-    # Detect license coordinates
-    license_coordinates, image_with_contour = detect_license_coordinates(input_image_path)
-    
-    if license_coordinates:
-        print("Coordinates of the license corners:", license_coordinates)
-        # Display the image with contour
-        cv2.imshow("License Image with Contour", image_with_contour)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
 
 

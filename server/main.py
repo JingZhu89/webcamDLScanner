@@ -21,8 +21,8 @@ def processWebcamDL():
     data = request.get_json()
     img = data['img']
     decodeBase64Img(img)
-    returnedData = processData()
-    # cleanUpImg()
+    returnedData = processData('webcam')
+    cleanUpImg()
   except Exception as e:
     if isinstance(e, TextParserExceptions) or isinstance(e, PreProcessorExceptions):
       return {'error': e.addtionalMsg}, 400
@@ -36,7 +36,7 @@ def processUploadDL():
   try:
     img = request.files['img']
     Image.open(img).save(TEMP_IMG_LOCATION)
-    returnedData = processData()
+    returnedData = processData('upload')
     cleanUpImg()
   except Exception as e:
     if isinstance(e, TextParserExceptions) or isinstance(e, PreProcessorExceptions):
@@ -56,10 +56,10 @@ def decodeBase64Img(img):
 def cleanUpImg():
   os.remove(TEMP_IMG_LOCATION)
 
-def processData():
-  myPorcessor = PreProcessor('test_images/temp_decoded.jpeg')
+def processData(type):
+  myPorcessor = PreProcessor('test_images/temp_decoded.jpeg', type)
   easy = EasyOCR(myPorcessor.grayScaleImgPath)
-  parse = ParseText(easy.MIN, easy.MAX, easy.extract())
-  # myPorcessor.cleanupFiles()
+  parse = ParseText(easy.extract())
+  myPorcessor.cleanupFiles()
   returnData =  parse.parseData()
   return returnData

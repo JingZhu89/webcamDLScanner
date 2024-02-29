@@ -10,11 +10,14 @@ STATE_PREFIX = {
 }
 
 STATE_COORDINATES = {
-  'MARKER' : {'coordinate': [[301, 27], [721, 27], [721, 119], [301, 119]], 'text': 'MISSOURI'},
-  'FIRST_NAME' : {'coordinate': [[305, 287], [655, 287], [655, 325], [305, 325]]},
-  'LAST_NAME': {'coordinate': [[322, 253], [469, 253], [469, 293], [322, 293]]},
-  'ISSUE_DATE' : {'coordinate': [[659, 499], [885, 499], [885, 535], [659, 535]]},
-  'EXPIRATION_DATE' : {'coordinate': [[710, 180], [886, 180], [886, 220], [710, 220]]},
-  'ADDRESS_LINE_ONE': {'coordinate':[[306, 322], [520, 322], [520, 352], [306, 352]]},
-  'ADDRESS_LINE_TWO': {'coordinate': [[321, 346], [672, 346], [672, 378], [321, 378]]}
+  'MISSOURI' : {'state' : {'coordinate': [[301, 27], [721, 27], [721, 119], [301, 119]]},
+                'first_name' : {'coordinate': [[305, 287], [655, 287], [655, 325], [305, 325]]},
+                'last_name': {'coordinate': [[322, 253], [469, 253], [469, 293], [322, 293]]},
+                'issue_date' : {'coordinate': [[659, 499], [885, 499], [885, 535], [659, 535]]},
+                'expiration_date' : {'coordinate': [[710, 180], [886, 180], [886, 220], [710, 220]]},
+                'address_one': {'coordinate':[[306, 322], [520, 322], [520, 352], [306, 352]]},
+                'address_two': {'coordinate': [[321, 346], [672, 346], [672, 378], [321, 378]]}
+                }
 }
+
+STATE_DEVIATIONS = {'MISSOURI' : {'devX' : 140, 'devY' : 10, 'connectedDisDev' : 10}}

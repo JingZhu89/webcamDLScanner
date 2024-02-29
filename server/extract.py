@@ -12,8 +12,8 @@ class OCR(ABC):
     pass
 
 class EasyOCR(OCR):
-  MIN = -10
-  MAX = 10
+  allowedDeviationX = 30
+  allowedDeviationY = 5
   def __init__(self, path) -> None:
     super().__init__(path)
 
@@ -34,8 +34,9 @@ class EasyOCR(OCR):
 
 
 class KerasOCR(OCR):
-  MIN = -8
-  MAX = 10
+  allowedDeviationX = 30
+  allowedDeviationY = 5
+  connectedTextDistance = 5
   def __init__(self, path) -> None:
     super().__init__(path)
 
@@ -54,8 +55,8 @@ class KerasOCR(OCR):
       result.append(data)
     return result
 
-pp = PreProcessor("test_images/MO.webp")
-easy = EasyOCR(pp.grayScaleImgPath)
-data = easy.extract()
-for el in data : print(el)
 
+# pp = PreProcessor("test_images/MO.webp")
+# easy = EasyOCR(pp.grayScaleImgPath)
+# data = easy.extract()
+# for el in data : print(el)
