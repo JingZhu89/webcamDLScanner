@@ -14,7 +14,7 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
 
-@app.route('/webcam', methods=['POST'])
+@app.route('/dlreader/webcam', methods=['POST'])
 @cross_origin(supports_credentials=True)
 def processWebcamDL():
     try:
@@ -28,7 +28,7 @@ def processWebcamDL():
     return returnedData
 
 
-@app.route('/upload', methods=['POST'])
+@app.route('/dlreader/upload', methods=['POST'])
 @cross_origin(supports_credentials=True)
 def processUploadDL():
     try:

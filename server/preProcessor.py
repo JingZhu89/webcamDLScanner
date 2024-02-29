@@ -70,7 +70,7 @@ class PreProcessor:
         try:
             grayscale = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
             angle = determine_skew(grayscale)
-            self.img = ndimage.rotate(self.img, angle)
+            self.img = ndimage.rotate(self.img, angle, axes=(0, 1))
         except Exception as e:
             raise PreProcessorExceptions(
                 additionalMsg="unable to skewcorrect the image")

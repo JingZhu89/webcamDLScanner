@@ -1,6 +1,7 @@
 # A DRIVER LICENSE SCANNER APP
 
-- This app supports Missouri dl by default
+- This app supports the newest Missouri dl by default
+  [accepted MO DL format](https://www.fourstateshomepage.com/wp-content/uploads/sites/36/2020/06/Class-F-REAL-ID-Samantha-Driver.jpg)
 - To add support for other states, follow the steps below
   1. Download a nice scanned image of the desired state's DL
   2. Go to `/server`

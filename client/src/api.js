@@ -1,7 +1,10 @@
 import axios from "axios";
-const WEBCAMURL = "http://127.0.0.1:5000/webcam";
-const UPLOADURL = "http://127.0.0.1:5000/upload";
-
+const HOST =
+  process.env.NODE_ENV === "production"
+    ? "/dlreader"
+    : "http://127.0.0.1:5000/dlreader";
+const WEBCAMURL = HOST + "/webcam";
+const UPLOADURL = HOST + "/upload";
 export const getParsedData = async (data) => {
   let res;
   if (data["type"] === "webcam") {
@@ -19,6 +22,6 @@ export const getParsedData = async (data) => {
     formData.append("prefix", JSON.stringify(data.prefix));
     res = await axios.post(UPLOADURL, formData);
   }
-  
+
   return res.data;
 };

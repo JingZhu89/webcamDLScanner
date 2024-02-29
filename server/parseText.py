@@ -201,9 +201,13 @@ class ParseText:
             self.result['last_name'] = self.result['last_name'][1:].strip()
 
         if self.result['issue_date'] != None:
-            self.result['issue_date'] = self._getDate(
-                self.result['issue_date']).group()
+            match = self._getDate(
+                self.result['issue_date'])
+            if match != None:
+                self.result['issue_date'] = match.group()
 
         if self.result['expiration_date'] != None:
-            self.result['expiration_date'] = self._getDate(
-                self.result['expiration_date']).group()
+            match = self._getDate(
+                self.result['expiration_date'])
+            if match != None:
+                self.result['expiration_date'] = match.group()
