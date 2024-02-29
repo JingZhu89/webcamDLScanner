@@ -1,8 +1,4 @@
-from dataclasses import field
 import re
-import json
-from extract import EasyOCR
-from preProcessor import PreProcessor
 from appConfig import STATES, STATE_COORDINATES, STATE_DEVIATIONS
 from customException import TextParserExceptions
 
@@ -10,7 +6,6 @@ from customException import TextParserExceptions
 class ParseText:
     def __init__(self, extractedInfo) -> None:
         self.extractedInfo = extractedInfo
-
         # for el in extractedInfo: print(el)
 
     def parseData(self):

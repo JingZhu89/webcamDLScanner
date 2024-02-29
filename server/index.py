@@ -1,4 +1,3 @@
-from asyncio import constants
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from extract import EasyOCR, KerasOCR
@@ -10,8 +9,15 @@ import os
 from customException import TextParserExceptions, PreProcessorExceptions
 TEMP_IMG_LOCATION = "test_images/temp_decoded.jpeg"
 
-app = Flask(__name__)
+# app = Flask(__name__)
+app = Flask(__name__, static_folder='build', static_url_path='/')
+
 CORS(app, supports_credentials=True)
+
+
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
 
 
 @app.route('/dlreader/webcam', methods=['POST'])

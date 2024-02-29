@@ -1,5 +1,4 @@
 import unittest
-from unittest import result
 from unittest.mock import MagicMock
 from parseText import ParseText
 from customException import TextParserExceptions
