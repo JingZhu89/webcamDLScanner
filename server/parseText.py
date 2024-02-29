@@ -9,37 +9,15 @@ from customException import TextParserExceptions
 class ParseText:
   def __init__(self, extractedInfo) -> None:
     self.extractedInfo = extractedInfo
-    for el in extractedInfo: print(el)
+
+    # for el in extractedInfo: print(el)
 
   def parseData(self):
-    self._findStateName()
+    self._getStateData()
     self._findAllOffsets()
     self._findAllFields()
     self._cleanRawData()
     return self.result
-    # self.prefix = self._getPrefix()
-    # issueDate = self._getIssueDate()
-    # expirationDate = self._getExpirationDate()
-    # firstName = self._getFirstName()
-    # lastName = self._getLastName()
-    # addressOne = self._getAddressFirstLine()
-    # addressTwo = self._getAddressSecondLine(addressOne)
-    # extractedData = {
-    #                   'issue_date': issueDate,
-    #                   'expiration_date': expirationDate,
-    #                   'first_name': firstName,
-    #                   'last_name': lastName,
-    #                   'address_one': addressOne,
-    #                   'address_two' : addressTwo
-    #                 }
-    # return extractedData
-
-  def _findTuplesWithPrefix(self, prefix):
-    result = []
-    for el in self.extractedInfo:
-      if el['text'].startswith(prefix) and self._noTextBoxOnTheLeft(el):
-        result.append(el)
-    return result
 
   def _getCoordinatesFromData(self, dataSet):
     bottomLeft, bottomRight, topRight, topLeft = dataSet['coordinate']
@@ -120,13 +98,6 @@ class ParseText:
       result = result + dataSet['text']
     return result
 
-  def _stringsStartWithPrefix(self, prefix) -> list:
-    strings = []
-    dataSets = self._findTuplesWithPrefix(prefix)
-    for dataSet in dataSets:
-      strings.append(self._connectWithTextOnTheRight(dataSet))
-    return strings
-
   def _noTextBoxOnTheLeft(self, targetDataSet):
     t_lX, t_rX, t_tY, t_bY = self._getCoordinatesFromData(targetDataSet)
     for dataSet in self.extractedInfo:
@@ -135,70 +106,7 @@ class ParseText:
         return False
     return True
 
-  def _getIssueDate(self):
-    potential_matches = self._stringsStartWithPrefix(self.prefix['issue_date'])
-    for el in potential_matches:
-      match = self._getDate(el)
-      if match:
-        return match.group()
-
-  def _getExpirationDate(self):
-    potential_matches = self._stringsStartWithPrefix(self.prefix['expiration_date'])
-    for el in potential_matches:
-      match = self._getDate(el)
-      if match:
-        return match.group()
-
-  def _getFirstName(self):
-    potential_matches = self._stringsStartWithPrefix(self.prefix['first_name'])
-    for el in potential_matches:
-      match = re.search(r'^\d{1}[A-Z ]', el)
-      if match:
-        return el[1:].strip()
-
-  def _getLastName(self):
-    potential_matches = self._stringsStartWithPrefix(self.prefix['last_name'])
-    for el in potential_matches:
-      match = re.search(r'^\d{1}[A-Z ]', el)
-      if match:
-        return el[1:].strip()
-
-  def _getAddressFirstLine(self):
-    potential_matches = self._stringsStartWithPrefix(self.prefix['address'])
-    # need to add code to take out potential bad matches
-    if len(potential_matches) == 0 : return None
-    return potential_matches[0][1:].strip()
-
-  def _getAddressSecondLine(self, addressOne):
-    if addressOne == None: return None
-    addressOneObject = None
-    for el in self.extractedInfo:
-      if addressOne in el['text']:
-        addressOneObject = el
-        break
-    if addressOneObject == None: return None
-    t_lX, t_rX, t_tY, t_bY = self._getCoordinatesFromData(addressOneObject)
-    for el in self.extractedInfo:
-      lX, rX, tY, bY = self._getCoordinatesFromData(el)
-      if self._xOverlap(lX, rX, t_lX, t_rX) and self._yConnected(tY, bY, t_tY, t_bY):
-        addressTwo = self._connectWithTextOnTheRight(el)
-        return addressTwo.strip()
-  def _getPrefix(self):
-    state = self._findStateName()
-    return STATE_PREFIX[state]
-
-  # def _findStateName(self):
-  #   matched = []
-  #   for el in self.extractedInfo:
-  #     searchStr = el['text'].upper()
-  #     if searchStr in STATES and searchStr in STATE_PREFIX:
-  #         matched.append(searchStr)
-  #   if len(matched) > 1 or len(matched) == 0:
-  #     return "DEFAULT"
-  #   else :
-  #     return matched[0]
-
-  def _findStateName(self):
+  def _getStateData(self):
     matched = []
     for el in self.extractedInfo:
       searchStr = el['text'].upper().strip()
@@ -262,13 +170,13 @@ class ParseText:
     offsets = self.offsets
     for key in offsets:
       targetPos = self._findPosFromOffset(marker, offsets[key])
-      print(key, targetPos)
+      # print(key, targetPos)
       field = self._getFieldFromPos(targetPos)
       if field != None:
         result[key] = self._connectWithTextOnTheRight(field).strip()
       else:
         result[key] = None
-    print(result)
+    # print(result)
     self.result = result
 
   def _cleanRawData(self):
@@ -288,35 +196,3 @@ class ParseText:
 
     if self.result['expiration_date'] != None:
       self.result['expiration_date'] = self._getDate(self.result['expiration_date']).group()
-
-
-
-
-
-
-
-# pp = PreProcessor("test_images/MO.webp")
-# easy = EasyOCR(pp.grayScaleImgPath)
-# data = easy.extract()
-# for el in data : print(el)
-# test = ParseText(10, data)
-# test.parseData()
-
-# offset = test._findOffset([[301, 27], [721, 27], [721, 119], [301, 119]],[[305, 287], [655, 287], [655, 325], [305, 325]])
-# pos = test._findDataFromOffset([[301, 27], [721, 27], [721, 119], [301, 119]], offset)
-# print(pos)
-# print(test._getFieldFromPos(pos))
-
-
-
-
-
-
-# f = open('states.json')
-# data = json.load(f)
-# states = set()
-# for i in range(len(data)):
-#   states.add(data[i]['name'].upper())
-
-# print(states)
-

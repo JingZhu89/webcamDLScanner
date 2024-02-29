@@ -20,4 +20,4 @@ STATE_COORDINATES = {
                 }
 }
 
-STATE_DEVIATIONS = {'MISSOURI' : {'devX' : 140, 'devY' : 10, 'connectedDisDev' : 10}}
+STATE_DEVIATIONS = {'MISSOURI' : {'devX' : 140, 'devY' : 8, 'connectedDisDev' : 10}}

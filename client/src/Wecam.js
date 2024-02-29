@@ -1,6 +1,6 @@
 import Webcam from "react-webcam";
 import React, { useState, useRef, useCallback } from "react";
-import { Grid, Button, Box } from "@mui/material";
+import { Grid, Button, Box, Typography } from "@mui/material";
 
 function WebcamImage({ imgHandler, img }) {
   let [webcamOn, setWebcamOn] = useState(false);
@@ -15,6 +15,7 @@ function WebcamImage({ imgHandler, img }) {
     width: 1920,
     height: 1080,
     facingMode: "user",
+    aspectRatio: "1.59",
   };
 
   return (
@@ -65,13 +66,20 @@ function WebcamImage({ imgHandler, img }) {
           }}
         >
           <Grid xs={12} item textAlign="center">
+            <Typography variant="h5" sx={{ marginTop: "10px" }}>
+              Align with Frame, don't tilt!
+            </Typography>
             <Box
               textAlign="center"
               sx={{
                 border: 10,
                 borderRadius: 5,
-                margin: 5,
+                marginTop: 1,
+                marginBottom: 5,
+                marginLeft: 10,
+                marginRight: 10,
                 borderColor: "lightgray",
+                width: "75%",
               }}
             >
               <Webcam
@@ -79,7 +87,7 @@ function WebcamImage({ imgHandler, img }) {
                 forceScreenshotSourceSize
                 videoConstraints={videoConstraints}
                 audio={false}
-                height="100%"
+                aspectRatio=""
                 width="100%"
                 ref={webcamRef}
                 mirrored={true}

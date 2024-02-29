@@ -7,7 +7,6 @@ from parseText import ParseText
 import base64
 from PIL import Image
 import os
-import json
 from customException import TextParserExceptions, PreProcessorExceptions
 TEMP_IMG_LOCATION = "test_images/temp_decoded.jpeg"
 
