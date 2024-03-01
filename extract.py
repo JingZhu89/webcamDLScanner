@@ -1,5 +1,5 @@
 import easyocr
-import keras_ocr
+# import keras_ocr
 from abc import ABC, abstractmethod
 from preProcessor import PreProcessor
 
@@ -35,25 +35,25 @@ class EasyOCR(OCR):
         return result
 
 
-class KerasOCR(OCR):
-    def __init__(self, path) -> None:
-        super().__init__(path)
+# class KerasOCR(OCR):
+#     def __init__(self, path) -> None:
+#         super().__init__(path)
 
-    def extract(self):
-        self._getRawData()
-        return self._formatRawData()
+    # def extract(self):
+    #     self._getRawData()
+    #     return self._formatRawData()
 
-    def _getRawData(self):
-        pipeline = keras_ocr.pipeline.Pipeline()
-        self.rawData = pipeline.recognize([self.path])[0]
+    # def _getRawData(self):
+    #     pipeline = keras_ocr.pipeline.Pipeline()
+    #     self.rawData = pipeline.recognize([self.path])[0]
 
-    def _formatRawData(self):
-        result = []
-        for tuple in self.rawData:
-            data = {'coordinate': tuple[1][0],
-                    'text': tuple[0], 'confidence': None}
-            result.append(data)
-        return result
+    # def _formatRawData(self):
+    #     result = []
+    #     for tuple in self.rawData:
+    #         data = {'coordinate': tuple[1][0],
+    #                 'text': tuple[0], 'confidence': None}
+    #         result.append(data)
+    #     return result
 
 
 # pp = PreProcessor("test_images/MO.webp")

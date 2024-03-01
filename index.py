@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
-from extract import EasyOCR, KerasOCR
+from extract import EasyOCR
 from preProcessor import PreProcessor
 from parseText import ParseText
 import base64
