@@ -5,7 +5,8 @@
 1. Download the repo
 2. If you don't have Python and pipenv installed, install Python and pipenv
 3. Run `pipenv install` to install all dependencies under the root folder
-4. Run `flask --app index run` under the root folder
+4. Run `pipenv shell`
+5. Run `flask --app index run`
 
 - This app supports the newest Missouri dl by default
   [accepted MO DL format](https://www.fourstateshomepage.com/wp-content/uploads/sites/36/2020/06/Class-F-REAL-ID-Samantha-Driver.jpg)
